@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_equipment_loan" model="ir.actions.report">
+        <field name="name">Bukti Peminjaman</field>
+        <field name="model">equipment.loan</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">equipment_loan_tracker.report_loan_document</field>
+        <field name="report_file">equipment_loan_tracker.report_loan_document</field>
+        <field name="binding_model_id" ref="model_equipment_loan"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_loan_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2 class="mt-4">Bukti Peminjaman Alat</h2>
+                        <div class="row mt-4 mb-4">
+                            <div class="col-6">
+                                <strong>Nama Peminjam:</strong>
+                                <p t-field="o.borrower_id.name"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Status Transaksi:</strong>
+                                <p t-field="o.state"/>
+                            </div>
+                        </div>
+                        <table class="table table-sm table-bordered mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Alat yang Dipinjam</th>
+                                    <th>Tanggal Pinjam</th>
+                                    <th>Jatuh Tempo</th>
+                                    <th>Tgl Dikembalikan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span t-field="o.equipment_id.name"/></td>
+                                    <td><span t-field="o.loan_date"/></td>
+                                    <td><span t-field="o.due_date"/></td>
+                                    <td><span t-field="o.return_date"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="mt-4" t-if="o.line_notes">
+                            <strong>Kondisi / Catatan:</strong>
+                            <p t-field="o.line_notes"/>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

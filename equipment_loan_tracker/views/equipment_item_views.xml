@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_equipment_item_form" model="ir.ui.view">
+            <field name="name">equipment.item.form</field>
+            <field name="model">equipment.item</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar"/>
+                        <button name="action_set_available" type="object" string="Tandai Tersedia" invisible="state in ('available', 'on_loan')" class="oe_highlight"/>
+                        <button name="action_set_damaged" type="object" string="Tandai Rusak" invisible="state in ('damaged', 'on_loan')"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="category"/>
+                            <field name="notes"/>
+                            <field name="state" readonly="1"  />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_equipment_item_list" model="ir.ui.view">
+            <field name="name">equipment.item.list</field>
+            <field name="model">equipment.item</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="category"/>
+                    <field name="state"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_equipment_item_search" model="ir.ui.view">
+            <field name="name">equipment.item.search</field>
+            <field name="model">equipment.item</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <filter string="Tersedia" name="available" domain="[('state','=','available')]"/>
+                    <filter string="Dipinjam" name="on_loan" domain="[('state','=','on_loan')]"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_equipment_item" model="ir.actions.act_window">
+            <field name="name">Data Alat</field>
+            <field name="res_model">equipment.item</field>
+            <field name="view_mode">list,form</field>
+        </record>
+    </data>
+</odoo>

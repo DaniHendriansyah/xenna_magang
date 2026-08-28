@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_equipment_loan_form" model="ir.ui.view">
+            <field name="name">equipment.loan.form</field>
+            <field name="model">equipment.loan</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_confirm" type="object" string="Confirm" invisible="state != 'draft'" class="oe_highlight"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,ongoing,returned,late"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="borrower_id"/>
+                                <field name="borrower_phone"/>
+                            </group>
+                            <group>
+                                <field name="loan_date"/>
+                                <field name="loan_duration"/>
+                                <field name="due_date"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Daftar Alat yang Dipinjam" name="equipment_lines">
+                                <field name="loan_line_ids">
+                                    <list editable="bottom">
+                                        <field name="equipment_id"/>
+                                        <field name="notes"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_equipment_loan_list" model="ir.ui.view">
+            <field name="name">equipment.loan.list</field>
+            <field name="model">equipment.loan</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="borrower_id"/>
+                    <field name="borrower_phone"/>
+                    <field name="equipment_summary"/>
+                    <field name="loan_date"/>
+                    <field name="due_date"/>
+                    <field name="return_date"/>
+                    <field name="loan_duration"/>
+                    <field name="state"/>
+                    <button name="action_return" type="object" string="Return" invisible="state == 'returned' or state == 'returned_late'" class="oe_highlight"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="action_equipment_loan" model="ir.actions.act_window">
+            <field name="name">Peminjaman</field>
+            <field name="res_model">equipment.loan</field>
+            <field name="view_mode">list,form</field>
+        </record>
+    </data>
+</odoo>

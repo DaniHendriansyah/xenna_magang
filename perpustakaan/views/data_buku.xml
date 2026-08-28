@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="data_buku_view_list" model="ir.ui.view">
+            <field name="name">data_buku_view_list</field>
+            <field name="model">data.buku</field>
+            <field name="arch" type="xml">
+                <list string="data_buku_tree">
+                    <field name="no_buku"/>
+                    <field name="name"/>
+                    <field name="penerbit"/>
+                    <field name="tahun_terbit"/>
+                    <field name="jumlah_halaman"/>
+                    <field name="penulis"/>
+                    <field name="stok"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="data_buku_view_form" model="ir.ui.view">
+            <field name="name">data_buku_view_form</field>
+            <field name="model">data.buku</field>
+            <field name="arch" type="xml">
+                <form string="Data Buku">
+                    <sheet>
+                        <group>
+                            <field name="no_buku"/>
+                            <field name="name"/>
+                            <field name="penerbit"/>
+                            <field name="tahun_terbit"/>
+                            <field name="jumlah_halaman"/>
+                            <field name="penulis"/>
+                            <field name="stok"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="data_buku_action" model="ir.actions.act_window">
+            <field name="name">Data Buku</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">data.buku</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="menu_item_perpustakaan" name="Perpustakaan" sequence="1"/>
+        <menuitem id="menu_item_buku" name="Data Buku" action="data_buku_action" parent="perpustakaan.menu_item_perpustakaan" sequence="2"/>
+    </data>
+</odoo>
