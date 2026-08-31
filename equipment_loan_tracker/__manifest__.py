@@ -18,7 +18,6 @@
         'views/equipment_item_views.xml',
         'views/equipment_loan_views.xml',
         'security/ir.model.access.csv',
-        'data/cron.xml',
         'reports/loan_report.xml',
     ],
     'installable': True,

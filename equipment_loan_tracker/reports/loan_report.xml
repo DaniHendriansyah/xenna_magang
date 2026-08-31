@@ -36,12 +36,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><span t-field="o.equipment_id.name"/></td>
-                                    <td><span t-field="o.loan_date"/></td>
-                                    <td><span t-field="o.due_date"/></td>
-                                    <td><span t-field="o.return_date"/></td>
-                                </tr>
+                                <t t-foreach="o.loan_line_ids" t-as="line">
+                                    <tr>
+                                        <td><span t-field="line.equipment_id.name"/></td>
+                                        <td><span t-field="o.loan_date"/></td>
+                                        <td><span t-field="o.due_date"/></td>
+                                        <td><span t-field="o.return_date"/></td>
+                                    </tr>
+                                </t>
                             </tbody>
                         </table>
                         <div class="mt-4" t-if="o.line_notes">
