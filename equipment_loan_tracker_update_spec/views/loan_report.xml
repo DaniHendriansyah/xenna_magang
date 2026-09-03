@@ -16,8 +16,12 @@
                         <h2 class="mt-4">Bukti Peminjaman Alat</h2>
                         <div class="row mt-4 mb-4">
                             <div class="col-6">
-                                <strong>Nama Peminjam:</strong>
-                                <p t-field="o.borrower_id.name"/>
+                                <strong>Data Peminjam:</strong>
+                                <p class="mb-0">
+                                    <span t-field="o.borrower_id.name"/><br/>
+                                    <span t-if="o.borrower_phone"><span t-field="o.borrower_phone"/></span><br t-if="o.borrower_phone"/>
+                                    <span t-if="o.borrower_email"><span t-field="o.borrower_email"/></span>
+                                </p>
                             </div>
                             <div class="col-6">
                                 <strong>Status Transaksi:</strong>
@@ -36,7 +40,6 @@
                             <tbody>
                                 <t t-foreach="o.loan_line_ids" t-as="line">
                                     <tr>
-                                        <!-- Menggunakan product_id sesuai ERD baru -->
                                         <td><span t-field="line.product_id.name"/></td>
                                         <td><span t-field="o.loan_date"/></td>
                                         <td><span t-field="o.due_date"/></td>
