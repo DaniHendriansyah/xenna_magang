@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="equipment_loan_view_search" model="ir.ui.view">
+        <field name="name">equipment.loan.view.search</field>
+        <field name="model">equipment.loan</field>
+        <field name="arch" type="xml">
+            <search string="Pencarian Peminjaman">
+                <field name="borrower_id"/>
+                <field name="borrower_phone"/>
+                <field name="state"/>
+                <field name="loan_date"/>
+                <field name="due_date"/>
+                <separator/>
+                <filter name="filter_ongoing" string="Sedang Dipinjam" domain="[('state', '=', 'ongoing')]"/>
+                <filter name="filter_late" string="Terlambat" domain="[('state', '=', 'late')]"/>
+                <filter name="filter_returned" string="Dikembalikan" domain="[('state', '=', 'returned')]"/>
+                <filter name="filter_lost" string="Hilang" domain="[('state', '=', 'lost')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="equipment_loan_view_list" model="ir.ui.view">
+        <field name="name">equipment.loan.view.list</field>
+        <field name="model">equipment.loan</field>
+        <field name="arch" type="xml">
+            <list string="Equipment Loan">
+                <field name="borrower_id"/>
+                <field name="borrower_phone"/>
+                <field name="borrower_email"/>
+                <field name="loan_items_summary"/>
+                <field name="loan_date"/>
+                <field name="due_date"/>
+                <field name="return_date"/>
+                <field name="duration_days" string="Durasi Peminjaman (Hari)"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'ongoing'" decoration-success="state == 'returned'" decoration-danger="state in ('late', 'lost')"/>
+                <button name="action_return" type="object" string="Return" class="btn-primary" invisible="state != 'ongoing'"/>    
+                <button name="action_mark_lost" type="object" string="Declare Lost" class="btn-danger" invisible="state != 'ongoing'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="equipment_loan_view_form" model="ir.ui.view">
+        <field name="name">equipment.loan.view.form</field>
+        <field name="model">equipment.loan</field>
+        <field name="arch" type="xml">
+            <form string="Equipment Loan">
+                <header>
+                    <button name="%(equipment_loan_tracker_update_spec.action_report_loan_update_spec)d" type="action" string="Cetak Bukti" class="btn-secondary" invisible="state == 'draft'"/>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary" invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,ongoing,returned,late,lost"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="borrower_id"/>
+                            <field name="borrower_phone"/>
+                            <field name="borrower_email"/>
+                            <field name="invoice_id" invisible="state != 'lost'" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="loan_date"/>
+                            <field name="due_date"/>
+                            <field name="return_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Detail Barang">
+                            <field name="loan_line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="qty"/>
+                                    <field name="penalty_amount"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Catatan">
+                            <field name="line_notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="equipment_loan_action" model="ir.actions.act_window">
+        <field name="name">Equipment Loan</field>
+        <field name="res_model">equipment.loan</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="equipment_loan_view_search"/>
+    </record>
+
+    <menuitem id="menu_equipment_loan_root_new" name="Equipment Loan Tracker Update" sequence="10"/>
+    <menuitem id="menu_equipment_loan" name="Data Peminjaman" parent="menu_equipment_loan_root_new" action="equipment_loan_action" sequence="20"/>
+</odoo>

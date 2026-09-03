@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="picking_type_peminjaman" model="stock.picking.type">
+            <field name="name">Peminjaman Alat</field>
+            <field name="sequence_code">LOAN-OUT</field>
+            <field name="code">internal</field>
+            <field name="warehouse_id" search="[('code', '=', 'WH')]"/>
+            <field name="default_location_src_id" search="[('complete_name', 'ilike', '%WH/Stock%')]"/>
+            <field name="default_location_dest_id" search="[('complete_name', 'ilike', '%WH/Peminjaman%')]"/>
+        </record>
+
+        <record id="picking_type_pengembalian" model="stock.picking.type">
+            <field name="name">Pengembalian Alat</field>
+            <field name="sequence_code">LOAN-IN</field>
+            <field name="code">internal</field>
+            <field name="warehouse_id" search="[('code', '=', 'WH')]"/>
+            <field name="default_location_src_id" search="[('complete_name', 'ilike', '%WH/Peminjaman%')]"/>
+            <field name="default_location_dest_id" search="[('complete_name', 'ilike', '%WH/Stock%')]"/>
+        </record>
+    </data>
+</odoo>
