@@ -1,0 +1,84 @@
+<odoo>
+    <!-- Reminder H-1 -->
+    <record id="email_template_equipment_loan_reminder" model="mail.template">
+        <field name="name">Equipment Loan: Reminder H-1</field>
+        <field name="model_id" ref="model_equipment_loan"/>
+        <field name="subject">Pengingat Pengembalian Alat (Ref: #{{ object.id }}) - {{ object.borrower_id.name }}</field>
+        <field name="email_from">{{ user.email_formatted }}</field>
+        <field name="email_to">{{ object.borrower_id.email }}</field>
+        <field name="body_html" type="html">
+            <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333333; line-height: 1.5; max-width: 600px;">
+                <p>Halo <strong><t t-out="object.borrower_id.name"/></strong>,</p>
+                <p>Ini adalah pemberitahuan otomatis bahwa masa peminjaman inventaris Anda akan berakhir besok. Berikut adalah rincian data peminjaman Anda:</p>
+                
+                <table style="width: 100%; margin: 15px 0; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 5px 0; width: 35%;"><strong>No. Referensi</strong></td>
+                        <td style="padding: 5px 0;">: #<t t-out="object.id"/></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0;"><strong>Tanggal Pinjam</strong></td>
+                        <td style="padding: 5px 0;">: <t t-out="object.loan_date"/></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0;"><strong>Jatuh Tempo</strong></td>
+                        <td style="padding: 5px 0;">: <strong><t t-out="object.due_date"/></strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0;"><strong>Durasi Peminjaman</strong></td>
+                        <td style="padding: 5px 0;">: <t t-out="object.duration_days"/> Hari</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0; vertical-align: top;"><strong>Detail Barang</strong></td>
+                        <td style="padding: 5px 0;">: <t t-out="object.loan_items_summary"/></td>
+                    </tr>
+                </table>
+                
+                <p>Mohon agar segera mengembalikan peralatan tersebut ke bagian administrasi/inventaris sebelum batas waktu yang telah ditentukan. Terima kasih atas kerja sama Anda.</p>
+                
+                <br/>
+            </div>
+        </field>
+    </record>
+
+    <!-- Overdue Alert -->
+    <record id="email_template_equipment_loan_overdue" model="mail.template">
+        <field name="name">Equipment Loan: Overdue Alert</field>
+        <field name="model_id" ref="model_equipment_loan"/>
+        <field name="subject">PERINGATAN: Keterlambatan Pengembalian Alat (Ref: #{{ object.id }}) - {{ object.borrower_id.name }}</field>
+        <field name="email_from">{{ user.email_formatted }}</field>
+        <field name="email_to">{{ object.borrower_id.email }}</field>
+        <field name="body_html" type="html">
+            <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333333; line-height: 1.5; max-width: 600px;">
+                <p>Halo <strong><t t-out="object.borrower_id.name"/></strong>,</p>
+                <p>Berdasarkan catatan sistem kami, masa peminjaman inventaris Anda telah <strong>melewati batas waktu (jatuh tempo)</strong>.</p>
+                <p>Berikut adalah rincian data peminjaman Anda:</p>
+                
+                <table style="width: 100%; margin: 15px 0; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 5px 0; width: 35%;"><strong>No. Referensi</strong></td>
+                        <td style="padding: 5px 0;">: #<t t-out="object.id"/></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0;"><strong>Tanggal Pinjam</strong></td>
+                        <td style="padding: 5px 0;">: <t t-out="object.loan_date"/></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0;"><strong>Jatuh Tempo</strong></td>
+                        <td style="padding: 5px 0;">: <strong><t t-out="object.due_date"/></strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0; vertical-align: top;"><strong>Detail Barang</strong></td>
+                        <td style="padding: 5px 0;">: <t t-out="object.loan_items_summary"/></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0;"><strong>Status Terkini</strong></td>
+                        <td style="padding: 5px 0;">: <strong>Terlambat</strong></td>
+                    </tr>
+                </table>              
+                <p>Harap segera mengembalikan peralatan tersebut untuk menghindari denda harian atau tagihan penggantian atas kehilangan barang. Abaikan pesan ini jika Anda merasa sudah menyerahkannya ke inventaris.</p>
+                <br/>
+            </div>
+        </field>
+    </record>
+</odoo>
