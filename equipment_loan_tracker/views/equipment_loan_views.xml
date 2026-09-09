@@ -23,7 +23,7 @@
         <field name="name">equipment.loan.view.list</field>
         <field name="model">equipment.loan</field>
         <field name="arch" type="xml">
-            <list string="Equipment Loan">
+            <list string="Equipment Loan"> 
                 <field name="borrower_id"/>
                 <field name="borrower_phone"/>
                 <field name="borrower_email"/>
@@ -50,6 +50,12 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,ongoing,returned,late,lost"/>
                 </header>
                 <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1" string="No. Peminjaman"/>
+                        </h1>
+                    </div>
+                    
                     <group>
                         <group>
                             <field name="borrower_id"/>
@@ -74,11 +80,12 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Catatan">
+                        <page string="Catatan (Opsional)">
                             <field name="line_notes"/>
                         </page>
                     </notebook>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -90,6 +97,6 @@
         <field name="search_view_id" ref="equipment_loan_view_search"/>
     </record>
 
-    <menuitem id="menu_equipment_loan_root_new" name="Equipment Loan Tracker Update" sequence="10"/>
+    <menuitem id="menu_equipment_loan_root_new" name="Equipment Loan Tracker" sequence="10"/>
     <menuitem id="menu_equipment_loan" name="Data Peminjaman" parent="menu_equipment_loan_root_new" action="equipment_loan_action" sequence="20"/>
 </odoo>

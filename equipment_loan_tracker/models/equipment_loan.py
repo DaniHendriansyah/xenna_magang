@@ -7,6 +7,8 @@ class EquipmentLoan(models.Model):
     _description = 'Equipment Loan'
     _order = 'id desc'
 
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
+
     borrower_id = fields.Many2one('res.partner', string='Peminjam', required=True)
     borrower_phone = fields.Char(related='borrower_id.phone', string='No. Telepon', readonly=True)
     borrower_email = fields.Char(related='borrower_id.email', string='Email', readonly=True)
@@ -34,6 +36,11 @@ class EquipmentLoan(models.Model):
         compute='_compute_loan_items_summary',
         store=False
     )
+
+    def _compute_access_url(self):
+        super()._compute_access_url()
+        for loan in self:
+            loan.access_url = f'/my/equipment-loans/{loan.id}'
 
     def _check_date_overlap(self):
         """Memvalidasi bentrok jadwal (Date-Range Overlap) per Serial Number"""
@@ -223,6 +230,30 @@ class EquipmentLoan(models.Model):
             loan.state = 'late'
             if template_overdue and loan.borrower_id.email:
                 template_overdue.send_mail(loan.id)
+
+class EquipmentLoanExtension(models.Model):
+    _name = 'equipment.loan.extension'
+    _description = 'Equipment Loan Extension Request'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
+    loan_id = fields.Many2one('equipment.loan', string='Loan Reference', required=True, ondelete='cascade')
+    borrower_id = fields.Many2one(related='loan_id.borrower_id', store=True, string='Borrower')
+    requested_date = fields.Date(string='Requested Extension Date', required=True)
+    reason = fields.Text(string='Reason')
+    state = fields.Selection([
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ], string='Status', default='pending', tracking=True)
+
+    def action_approve(self):
+        for record in self:
+            record.loan_id.write({'due_date': record.requested_date})
+            record.state = 'approved'
+
+    def action_reject(self):
+        for record in self:
+            record.state = 'rejected'
 
 class EquipmentLoanLine(models.Model):
     _name = 'equipment.loan.line'

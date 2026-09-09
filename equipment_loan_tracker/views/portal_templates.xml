@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_my_home_menu_equipment_loan" name="Portal My Home: Equipment Loans" inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/equipment_loan_tracker/static/src/img/icon_loan.png'"/>
+                <t t-set="title">Peminjaman Alat</t>
+                <t t-set="text">Lihat riwayat dan status peminjaman alat</t>
+                <t t-set="url" t-value="'/my/equipment-loans'"/>
+                <t t-set="count" t-value="equipment_loan_count"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="portal_my_equipment_loans_template" name="My Equipment Loans">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Peminjaman Alat</t>
+            </t>
+
+            <t t-if="not loans">
+                <div class="alert alert-warning" role="alert">
+                    Tidak ada data peminjaman alat ditemukan untuk akun Anda.
+                </div>
+            </t>
+
+            <t t-if="loans">
+                <div class="table-responsive">
+                    <table class="table table-hover bg-white rounded shadow-sm">
+                        <thead>
+                            <tr class="active">
+                                <th>No. Peminjaman</th>
+                                <th>Tanggal Pinjam</th>
+                                <th>Jatuh Tempo</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="loans" t-as="loan">
+                                <td>
+                                    <a t-attf-href="/my/equipment-loans/#{loan.id}">
+                                        <span t-field="loan.display_name"/>
+                                    </a>
+                                </td>
+                                <td><span t-field="loan.loan_date"/></td>
+                                <td><span t-field="loan.due_date"/></td>
+                                <td>
+                                    <span t-if="loan.state == 'draft'" class="badge text-bg-secondary">Draft</span>
+                                    <span t-if="loan.state == 'ongoing'" class="badge text-bg-warning">Sedang Dipinjam</span>
+                                    <span t-if="loan.state == 'returned'" class="badge text-bg-success">Dikembalikan</span>
+                                    <span t-if="loan.state == 'late'" class="badge text-bg-danger">Terlambat</span>
+                                    <span t-if="loan.state == 'lost'" class="badge text-bg-dark">Hilang</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="o_portal_pager text-center">
+                    <t t-call="portal.pager"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- detail -->
+    <template id="portal_equipment_loan_detail_template" name="Equipment Loan Detail">
+        <t t-call="portal.portal_layout">
+            <t t-set="loan_page" t-value="True"/>
+            
+            <div id="optional_paperflow">
+                <div class="card mt-3">
+                    <div class="card-header bg-white pb-1">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <h4>Dokumen Peminjaman: <span t-field="loan.display_name"/></h4>
+                            </div>
+                            <div class="col-lg-6 text-end">
+                                <span t-if="loan.state == 'draft'" class="badge text-bg-secondary">Draft</span>
+                                <span t-if="loan.state == 'ongoing'" class="badge text-bg-warning">Sedang Dipinjam</span>
+                                <span t-if="loan.state == 'returned'" class="badge text-bg-success">Dikembalikan</span>
+                                <span t-if="loan.state == 'late'" class="badge text-bg-danger">Terlambat</span>
+                                <span t-if="loan.state == 'lost'" class="badge text-bg-dark">Hilang</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <h5>Informasi Peminjam</h5>
+                                <strong>Nama:</strong> <span t-field="loan.borrower_id.name"/><br/>
+                                <strong>Email:</strong> <span t-field="loan.borrower_email"/><br/>
+                                <strong>No. Telepon:</strong> <span t-field="loan.borrower_phone"/>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Informasi Waktu</h5>
+                                <strong>Tanggal Pinjam:</strong> <span t-field="loan.loan_date"/><br/>
+                                <strong>Jatuh Tempo:</strong> <span t-field="loan.due_date"/><br/>
+                                <strong>Durasi:</strong> <span t-field="loan.duration_days"/> Hari<br/>
+                                <t t-if="loan.return_date">
+                                    <strong>Tanggal Kembali:</strong> <span t-field="loan.return_date"/><br/>
+                                </t>
+                                <div class="mt-2" t-if="loan.invoice_id">
+                                    <strong>Invoice Denda:</strong> 
+                                    <a t-attf-href="/my/invoices/#{loan.invoice_id.id}" class="btn btn-sm btn-outline-danger ms-2">
+                                        Lihat Invoice
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr/>
+                        
+                        <h5>Detail Barang</h5>
+                        <div class="table-responsive mb-4">
+                            <table class="table table-sm table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nama Barang</th>
+                                        <th>Serial Number (SN)</th>
+                                        <th>Jumlah</th>
+                                        <th t-if="loan.state in ('late', 'lost')">Denda</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="loan.loan_line_ids" t-as="line">
+                                        <td><span t-esc="line.product_id.sudo().name"/></td>
+                                        <td><span t-esc="line.lot_id.sudo().name"/></td>
+                                        <td><span t-esc="line.qty"/></td>
+                                        <td t-if="loan.state in ('late', 'lost')">
+                                            <span t-field="line.penalty_amount" t-options='{"widget": "monetary", "display_currency": loan.env.company.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row" t-if="loan.line_notes">
+                            <div class="col-12">
+                                <h5>Catatan / Kondisi</h5>
+                                <div class="p-3 bg-light rounded text-muted">
+                                    <span t-field="loan.line_notes"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4" id="loan_communication">
+                <h3>Riwayat Aktivitas</h3>
+                <t t-call="portal.message_thread">
+                    <t t-set="object" t-value="loan"/>
+                </t>
+            </div>
+        </t>
+    </template>
+</odoo>
