@@ -30,6 +30,7 @@ Sistem peminjaman barang yang terintegrasi dengan:
         'views/equipment_loan_views.xml',
         'views/product_template_views.xml',
         'views/portal_templates.xml',
+        'views/equipment_loan_extension_views.xml',
         'data/locations.xml',
         'data/stock_data.xml',
         'data/email_data.xml',

@@ -25,6 +25,7 @@ class EquipmentLoanPortal(CustomerPortal):
             'date': {'label': 'Tanggal Pinjam', 'order': 'loan_date desc'},
             'due': {'label': 'Jatuh Tempo', 'order': 'due_date asc'},
             'state': {'label': 'Status', 'order': 'state'},
+            'name': {'label': 'No. Peminjaman', 'order': 'name desc'},
         }
 
         if not sortby:
@@ -79,3 +80,59 @@ class EquipmentLoanPortal(CustomerPortal):
         })
         
         return request.render("equipment_loan_tracker.portal_equipment_loan_detail_template", values)
+
+    @http.route(['/my/equipment-loans/extend/<int:loan_id>'], type='http', auth="user", methods=['POST'], website=True)
+    def request_extension(self, loan_id, **post):
+        loan = request.env['equipment.loan'].browse(loan_id)
+        
+        if loan.borrower_id != request.env.user.partner_id:
+            return request.redirect('/my')
+
+        requested_date = post.get('requested_date')
+        reason = post.get('reason')
+
+        if requested_date:
+            request.env['equipment.loan.extension'].sudo().create({
+                'loan_id': loan.id,
+                'requested_date': requested_date,
+                'reason': reason,
+            })
+        
+        return request.redirect(f'/my/equipment-loans/{loan.id}')
+
+    @http.route(['/my/equipment-loans/new'], type='http', auth="user", website=True)
+    def portal_new_loan(self, **kw):
+        # Ambil data unit fisik (Serial Number) yang tersedia untuk dipilih
+        lots = request.env['stock.lot'].sudo().search([])
+        
+        values = self._prepare_portal_layout_values()
+        values.update({
+            'lots': lots,
+            'page_name': 'equipment_loan_new',
+        })
+        return request.render("equipment_loan_tracker.portal_new_loan_form", values)
+
+    @http.route(['/my/equipment-loans/submit'], type='http', auth="user", methods=['POST'], website=True)
+    def portal_submit_loan(self, **post):
+        partner = request.env.user.partner_id
+        loan_date = post.get('loan_date')
+        due_date = post.get('due_date')
+        lot_id = int(post.get('lot_id'))
+        
+        lot = request.env['stock.lot'].sudo().browse(lot_id)
+        
+        new_loan = request.env['equipment.loan'].sudo().create({
+            'borrower_id': partner.id,
+            'loan_date': loan_date,
+            'due_date': due_date,
+            'state': 'draft',
+        })
+        
+        request.env['equipment.loan.line'].sudo().create({
+            'loan_id': new_loan.id,
+            'product_id': lot.product_id.id,
+            'lot_id': lot.id,
+            'qty': 1,
+        })
+        
+        return request.redirect(f'/my/equipment-loans/{new_loan.id}')

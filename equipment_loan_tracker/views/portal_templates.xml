@@ -27,6 +27,13 @@
             </t>
 
             <t t-if="loans">
+                <div class="row mb-3">
+                    <div class="col-12 text-end">
+                        <a href="/my/equipment-loans/new" class="btn btn-primary">
+                            <i class="fa fa-plus me-1"/> Buat Peminjaman Baru
+                        </a>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover bg-white rounded shadow-sm">
                         <thead>
@@ -83,6 +90,12 @@
                                 <span t-if="loan.state == 'returned'" class="badge text-bg-success">Dikembalikan</span>
                                 <span t-if="loan.state == 'late'" class="badge text-bg-danger">Terlambat</span>
                                 <span t-if="loan.state == 'lost'" class="badge text-bg-dark">Hilang</span>
+                                
+                                <t t-if="loan.state == 'ongoing'">
+                                    <button type="button" class="btn btn-sm btn-warning ms-2" data-bs-toggle="modal" t-attf-data-bs-target="#modalExtension{{ loan.id }}">
+                                        <i class="fa fa-calendar-plus-o me-1"/> Ajukan Perpanjangan
+                                    </button>
+                                </t>
                             </div>
                         </div>
                     </div>
@@ -148,12 +161,88 @@
                     </div>
                 </div>
             </div>
+
+            <div t-attf-id="modalExtension{{ loan.id }}" class="modal fade" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <form t-attf-action="/my/equipment-loans/extend/{{ loan.id }}" method="post">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="modal-header bg-warning">
+                                <h5 class="modal-title">Request Perpanjangan Waktu</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="requested_date" class="form-label fw-bold">Tanggal Jatuh Tempo Baru</label>
+                                    <input type="date" class="form-control" name="requested_date" required="1" t-att-min="loan.due_date"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="reason" class="form-label fw-bold">Alasan Perpanjangan</label>
+                                    <textarea class="form-control" name="reason" rows="3" required="1" placeholder="Misal: Alat masih digunakan untuk penyelesaian proyek..."></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-primary">Kirim Request</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
             
             <div class="mt-4" id="loan_communication">
                 <h3>Riwayat Aktivitas</h3>
                 <t t-call="portal.message_thread">
                     <t t-set="object" t-value="loan"/>
                 </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- Form Peminjaman Baru -->
+    <template id="portal_new_loan_form" name="Form Peminjaman Baru">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Formulir Peminjaman Alat</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/my/equipment-loans/submit" method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Tanggal Pinjam</label>
+                                <input type="date" class="form-control" name="loan_date" required="1" t-att-value="datetime.date.today()"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Tanggal Jatuh Tempo</label>
+                                <input type="date" class="form-control" name="due_date" required="1"/>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Pilih Barang (Unit Spesifik)</label>
+                            <select class="form-select" name="lot_id" required="1">
+                                <option value="">-- Pilih Barang yang Akan Dipinjam --</option>
+                                <t t-foreach="lots" t-as="lot">
+                                    <option t-att-value="lot.id">
+                                        <t t-esc="lot.product_id.name"/> [SN: <t t-esc="lot.name"/>]
+                                    </option>
+                                </t>
+                            </select>
+                            <div class="form-text">Pilih alat berdasarkan Serial Number (SN) yang tersedia.</div>
+                        </div>
+                        
+                        <div class="mt-4 pt-3 border-top text-end">
+                            <a href="/my/equipment-loans" class="btn btn-secondary me-2">Batal</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-paper-plane me-1"/> Kirim Permohonan
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </t>
     </template>
